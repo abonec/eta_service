@@ -28,9 +28,10 @@ task recreate_index: :environment do
 end
 namespace :recreate_index do
   desc 'recreate index with data'
-  task with_data: :recreate_index do
+  task :with_data, [:cabs] => [:recreate_index] do |task, args|
+    cabs_size = (args[:cabs] || 100000).to_i
     vacant = [true,false]
-    File.readlines('cabs.txt').map(&:strip).each do |location|
+    File.readlines('cabs.txt').first(cabs_size).map(&:strip).each do |location|
       App::Cab.new(vacant: vacant.sample, location: location).__elasticsearch__.index_document
     end
   end

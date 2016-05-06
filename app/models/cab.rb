@@ -1,8 +1,9 @@
 module App
   class Cab
-    DISTANCE = '15km'
+    DISTANCE = '30km'
     CAB_SIZE = 3
     ETA_MODIFIER = 1.5
+    DEFAULT_ETA = :so_far_so_good
     include ActiveModel::Model
     include Elasticsearch::Model
 
@@ -22,6 +23,7 @@ module App
     class << self
       def eta_for(lat, lon)
         distances = nearest(lat, lon).response.dig('hits', 'hits').map{|hit|hit['sort'].first.to_f}
+        return DEFAULT_ETA if distances.empty?
         (distances.inject(:+) / distances.size) * ETA_MODIFIER
       end
       def nearest(lat, lon)
