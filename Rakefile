@@ -1,5 +1,6 @@
 task :environment do
   require_relative 'app'
+  require 'active_support/core_ext/array/grouping'
 end
 desc 'Print api routes'
 task routes: :environment do
@@ -26,21 +27,21 @@ task recreate_index: :environment do
   App::Cab.__elasticsearch__.create_index! force: true
   App::Cab.__elasticsearch__.refresh_index!
 end
+IMPORT_BATCH_SIZE = 100_000
 namespace :recreate_index do
   desc 'recreate index with data'
-  task :with_data, [:cabs] => [:recreate_index] do |task, args|
-    cabs_size = (args[:cabs] || 100000).to_i
-    vacant = [true,false]
+  task :with_data, [:size] => [:recreate_index] do |task, args|
+    vacants = [true,false]
     client = Elasticsearch::Client.new
-    locations = File.readlines('cabs.txt').first(cabs_size).map(&:strip)
+    locations = File.readlines('cabs.txt').map(&:strip)
+    locations = locations.first(args[:size]) if args[:size]
 
-
-    bulk_index = locations.map do |location|
-      [{index: {_index: 'cabs', _type: 'cab'}},{vacant: vacant.sample, location: location}]
-    end.flatten
-
-
-    client.bulk body: bulk_index
+    locations.in_groups_of(IMPORT_BATCH_SIZE) do |locations_batch|
+      index_bulk = locations_batch.map do |location|
+        [{index: {_index: 'cabs', _type: 'cab'}},{vacant: vacants.sample, location: location}]
+      end.flatten
+      client.bulk body: index_bulk
+    end
   end
 end
 
