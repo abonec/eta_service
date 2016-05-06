@@ -3,6 +3,7 @@
 ## Explanation
 
 All calculation about distance and selecting cab executed on elasticsearch node. Ruby just calculate ETA based on distance which was precalculated by elasticsearch using haversine formula.
+Elasticsearch was chosen because of good performance in geo calculations
 
 ## Further development
 
