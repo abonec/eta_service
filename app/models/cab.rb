@@ -66,15 +66,15 @@ module App
       indices.delete index: settings.index_name if index_exists?
       indices.create index: settings.index_name, body: { mappings: mappings }
     end
-    def connection
-      @connection ||= Elasticsearch::Client.new
+    def index_exists?
+      indices.exists(index: settings.index_name) rescue false
     end
     def indices
       connection.indices
     end
 
-    def index_exists?
-      indices.exists(index: settings.index_name) rescue false
+    def connection
+      @connection ||= Elasticsearch::Client.new
     end
     def settings
       @settings ||= Settings.cab
