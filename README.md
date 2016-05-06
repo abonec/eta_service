@@ -25,6 +25,10 @@ All calculation about distance and selecting cab executed on elasticsearch node.
 
 ***cabs_num*** is up to 100000 (default = 100_000)
 
+## Get example ETA
+
+<a href="http://localhost:3000/api/v1/cabs/eta?lat=55.662987&lon=37.656230" target="_blank"> http://localhost:3000/api/v1/cabs/eta?lat=55.662987&lon=37.656230</a>
+
 ## Routes
 
 * `rake routes`
