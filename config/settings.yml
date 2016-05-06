@@ -1,0 +1,8 @@
+---
+cab:
+  index_name: :cabs
+  index_type: :cab
+  distance: '30km'
+  cab_size: 3
+  eta_modifier: 1.5
+  default_eta: :so_far_so_good

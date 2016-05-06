@@ -1,67 +1,83 @@
 module App
-  class Cab
-    DISTANCE = '30km'
-    CAB_SIZE = 3
-    ETA_MODIFIER = 1.5
-    DEFAULT_ETA = :so_far_so_good
-    include ActiveModel::Model
-    include Elasticsearch::Model
+  module Cab
+    module_function
 
-    attr_accessor :location, :vacant, :id
-    index_name 'cabs'
-    settings number_of_shards: 1 do
-      mappings do
-        indexes :location, type: :geo_point
-        indexes :vacant, type: :boolean
-      end
+    def eta_for(lat, lon)
+      distances = nearest(lat, lon).dig('hits', 'hits').map{|hit|hit['sort'].first.to_f}
+      return settings.default_eta if distances.empty?
+      (distances.inject(:+) / distances.size) * settings.eta_modifier
+    end
+    def nearest(lat, lon)
+      connection.search index: settings.index_name, type: settings.index_type, body: nearest_query(lat, lon)
     end
 
-    def as_json(*)
-      { vacant: vacant, location: location }
+    def nearest_query(lat, lon)
+      {
+          size: settings.cab_size,
+          query: {
+              filtered: {
+                  query: {
+                      match: {
+                          vacant: true
+                      }
+                  },
+                  filter: {
+                      geo_distance: {
+                          distance: settings.distance,
+                          location: {
+                              lat: lat,
+                              lon: lon
+                          }
+                      }
+                  }
+              }
+          },
+          sort: [
+              {
+                  _geo_distance: {
+                      location: {
+                          lat:  lat,
+                          lon: lon
+                      },
+                      order:         :asc,
+                      unit:          :km,
+                      distance_type: :sloppy_arc
+                  }
+              }
+          ]
+      }
+    end
+    def mappings
+      {
+          cab: {
+              properties: {
+                  location: {
+                      type: :geo_point
+                  },
+                  vacant: {
+                      type: :boolean
+                  }
+              }
+          }
+      }
     end
 
-    class << self
-      def eta_for(lat, lon)
-        distances = nearest(lat, lon).response.dig('hits', 'hits').map{|hit|hit['sort'].first.to_f}
-        return DEFAULT_ETA if distances.empty?
-        (distances.inject(:+) / distances.size) * ETA_MODIFIER
-      end
-      def nearest(lat, lon)
-        search({
-                   size: CAB_SIZE,
-                   query: {
-                       filtered: {
-                           query: {
-                               match: {
-                                   vacant: true
-                               }
-                           },
-                           filter: {
-                               geo_distance: {
-                                   distance: DISTANCE,
-                                   location: {
-                                       lat: lat,
-                                       lon: lon
-                                   }
-                               }
-                           }
-                       }
-                   },
-                   sort: [
-                       {
-                           _geo_distance: {
-                               location: {
-                                   lat:  lat,
-                                   lon: lon
-                               },
-                               order:         :asc,
-                               unit:          :km,
-                               distance_type: :sloppy_arc
-                           }
-                       }
-                   ]
-               })
-      end
+    def recreate_index!
+      indices.delete index: settings.index_name if index_exists?
+      indices.create index: settings.index_name, body: { mappings: mappings }
+    end
+    def connection
+      @connection ||= Elasticsearch::Client.new
+    end
+    def indices
+      connection.indices
+    end
+
+    def index_exists?
+      indices.exists(index: settings.index_name) rescue false
+    end
+    def settings
+      @settings ||= Settings.cab
     end
   end
 end
