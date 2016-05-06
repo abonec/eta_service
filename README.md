@@ -1,5 +1,14 @@
 # eta_service
 
+## Explanation
+
+All calculation about distance and selecting cab executed on elasticsearch node. Ruby just calculate ETA based on distance which was precalculated by elasticsearch using haversine formula.
+
+## Further development
+
+* replace lat&lon by geohash precalculated by client
+* enable caching based on reduced dimension of given geohash
+
 ## Requirements
 
 * Ruby 2.3
@@ -31,7 +40,7 @@
 * `puma -p3000`
 * `ab -n 1000 -c 2 http://localhost:3000/api/v1/cabs/eta\?lat\=55.662987\&lon\=37.656235`
 
-On i5-2410M laptop with 100_000 records:
+On i5-2410M laptop with 100_000 cabs in base:
 
 <pre>Concurrency Level:      2
 Time taken for tests:   2.607 seconds
