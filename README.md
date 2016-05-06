@@ -14,9 +14,7 @@
 
 * `rake recreate_index:with_data[cabs_num]`
 
-***cabs_num*** is up to 100_000
-
-100_000 records are imported for 13 minutes on old i5 laptop
+***cabs_num*** is up to 100000 (default = 100_000)
 
 ## Routes
 

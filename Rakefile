@@ -31,9 +31,16 @@ namespace :recreate_index do
   task :with_data, [:cabs] => [:recreate_index] do |task, args|
     cabs_size = (args[:cabs] || 100000).to_i
     vacant = [true,false]
-    File.readlines('cabs.txt').first(cabs_size).map(&:strip).each do |location|
-      App::Cab.new(vacant: vacant.sample, location: location).__elasticsearch__.index_document
-    end
+    client = Elasticsearch::Client.new
+    locations = File.readlines('cabs.txt').first(cabs_size).map(&:strip)
+
+
+    bulk_index = locations.map do |location|
+      [{index: {_index: 'cabs', _type: 'cab'}},{vacant: vacant.sample, location: location}]
+    end.flatten
+
+
+    client.bulk body: bulk_index
   end
 end
 
