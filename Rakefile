@@ -1,6 +1,8 @@
-require_relative 'app'
+task :environment do
+  require_relative 'app'
+end
 desc 'Print api routes'
-task :routes do
+task routes: :environment do
   mapping = method_mapping
 
   grape_klasses = ObjectSpace.each_object(Class).select { |klass| klass < Grape::API }
@@ -16,6 +18,21 @@ task :routes do
     version = api.send(mapping[:version]).to_s.ljust(version_width)
     desc = api.send(mapping[:description]).to_s.ljust(desc_width)
     puts "     #{method}  |  #{path}  |  #{version}  |  #{desc}"
+  end
+end
+
+desc 'recreate index'
+task recreate_index: :environment do
+  App::Cab.__elasticsearch__.create_index! force: true
+  App::Cab.__elasticsearch__.refresh_index!
+end
+namespace :recreate_index do
+  desc 'recreate index with data'
+  task with_data: :recreate_index do
+    vacant = [true,false]
+    File.readlines('cabs.txt').map(&:strip).each do |location|
+      App::Cab.new(vacant: vacant.sample, location: location).__elasticsearch__.index_document
+    end
   end
 end
 

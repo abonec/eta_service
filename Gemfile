@@ -1,4 +1,6 @@
 source 'https://rubygems.org'
-gem 'elasticsearch', git: 'git://github.com/elasticsearch/elasticsearch-ruby.git'
+gem 'elasticsearch-model'
 gem 'grape'
 gem 'rake'
+gem 'pry'
+gem 'activemodel', require: 'active_model'

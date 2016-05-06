@@ -6,7 +6,7 @@ module App
 
     resource :cabs do
       desc 'return eta for location'
-      get :eta do
+      post :eta do
         {result: :ok}
       end
     end
