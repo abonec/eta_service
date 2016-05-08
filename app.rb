@@ -4,7 +4,11 @@ Bundler.require
 require 'app/api'
 require 'app/models/cab'
 
-APP_ENV = 'development'
+
 module App
-  Config.load_and_set_settings(Config.setting_files(File.join(File.dirname(__FILE__), 'config'), APP_ENV))
+  def env
+    ENV['ENV'] || 'development'
+  end
+  module_function :env
+  Config.load_and_set_settings(Config.setting_files(File.join(File.dirname(__FILE__), 'config'), env))
 end

@@ -34,6 +34,10 @@ Elasticsearch was chosen because of good performance in geo calculations
 
 * `rake routes`
 
+## Run spec
+
+* `rspec`
+
 ## Console
 
 * `pry`

@@ -21,6 +21,7 @@ GEM
     deep_merge (1.0.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
+    diff-lcs (1.2.5)
     elasticsearch (1.0.17)
       elasticsearch-api (= 1.0.17)
       elasticsearch-transport (= 1.0.17)
@@ -61,7 +62,22 @@ GEM
     rack (1.6.4)
     rack-accept (0.4.5)
       rack (>= 0.4)
+    rack-test (0.6.3)
+      rack (>= 1.0)
     rake (11.1.2)
+    rspec (3.4.0)
+      rspec-core (~> 3.4.0)
+      rspec-expectations (~> 3.4.0)
+      rspec-mocks (~> 3.4.0)
+    rspec-core (3.4.4)
+      rspec-support (~> 3.4.0)
+    rspec-expectations (3.4.0)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-mocks (3.4.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.4.0)
+    rspec-support (3.4.1)
     slop (3.6.0)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
@@ -80,7 +96,9 @@ DEPENDENCIES
   elasticsearch
   grape
   pry
+  rack-test
   rake
+  rspec
 
 BUNDLED WITH
    1.12.1

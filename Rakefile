@@ -1,6 +1,5 @@
 task :environment do
   require_relative 'app'
-  require 'active_support/core_ext/array/grouping'
 end
 desc 'Print api routes'
 task routes: :environment do

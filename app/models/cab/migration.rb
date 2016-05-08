@@ -1,7 +1,8 @@
+require 'active_support/core_ext/array/grouping'
 module App
   module Cab
     module Migration
-      def load_data(file, limit)
+      def load_data(file, limit=0)
         locations = File.readlines(file).map(&:strip)
         locations = locations.first(limit) unless limit.zero?
 
