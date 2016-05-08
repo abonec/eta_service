@@ -1,5 +1,7 @@
+require 'app/models/cab/migration'
 module App
   module Cab
+    extend Migration
     module_function
 
     def eta_for(lat, lon)
@@ -47,32 +49,6 @@ module App
           ]
       }
     end
-    def mappings
-      {
-          cab: {
-              properties: {
-                  location: {
-                      type: :geo_point
-                  },
-                  vacant: {
-                      type: :boolean
-                  }
-              }
-          }
-      }
-    end
-
-    def recreate_index!
-      indices.delete index: settings.index_name if index_exists?
-      indices.create index: settings.index_name, body: { mappings: mappings }
-    end
-    def index_exists?
-      indices.exists(index: settings.index_name) rescue false
-    end
-    def indices
-      connection.indices
-    end
-
     def connection
       @connection ||= Elasticsearch::Client.new
     end

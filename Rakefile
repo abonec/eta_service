@@ -26,21 +26,10 @@ desc 'recreate index'
 task recreate_index: :environment do
   App::Cab.recreate_index!
 end
-IMPORT_BATCH_SIZE = 100_000
 namespace :recreate_index do
   desc 'recreate index with data'
   task :with_data, [:size] => [:recreate_index] do |task, args|
-    vacants = [true,false]
-    client = Elasticsearch::Client.new
-    locations = File.readlines('cabs.txt').map(&:strip)
-    locations = locations.first(args[:size].to_i) if args[:size]
-
-    locations.in_groups_of(IMPORT_BATCH_SIZE, false) do |locations_batch|
-      index_bulk = locations_batch.map do |location|
-        [{index: {_index: 'cabs', _type: 'cab'}},{vacant: vacants.sample, location: location}]
-      end.flatten
-      client.bulk body: index_bulk
-    end
+    App::Cab.load_data('cabs.txt', args[:size].to_i)
   end
 end
 
