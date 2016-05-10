@@ -49,6 +49,16 @@ module App
           ]
       }
     end
+
+    def create(location:, vacant:)
+      connection.create(index: settings.index_name, type: settings.index_type, body: {
+          location: location,
+          vacant: vacant,
+      })['_id']
+    end
+    def count
+      connection.count(index: settings.index_name)['count']
+    end
     def connection
       @connection ||= Elasticsearch::Client.new
     end

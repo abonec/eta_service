@@ -41,6 +41,13 @@ module App
       def indices
         connection.indices
       end
+      def refresh
+        indices.refresh
+      end
+
+      def put_settings(es_settings)
+        indices.put_settings index: @settings.index_name, body: es_settings
+      end
     end
   end
 end

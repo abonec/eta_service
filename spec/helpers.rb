@@ -8,6 +8,6 @@ module Helpers
   end
   def load_data
     App::Cab.load_data(test_cabs_file)
-    sleep 1
+    App::Cab.refresh
   end
 end
