@@ -15,45 +15,43 @@ module App
 
     def nearest_query(lat, lon)
       {
-          size: settings.cab_size,
-          query: {
-              filtered: {
-                  query: {
-                      match: {
-                          vacant: true
-                      }
-                  },
-                  filter: {
-                      geo_distance: {
-                          distance: settings.distance,
-                          location: {
-                              lat: lat,
-                              lon: lon
-                          }
-                      }
-                  }
+        size: settings.cab_size,
+        query: {
+          bool: {
+            must: {
+              match_all: {}
+            }, 
+            filter: {
+              geo_distance: {
+                distance: settings.distance,
+                location: {
+                  lat: lat,
+                  lon: lon
+                }
               }
-          },
-          sort: [
-              {
-                  _geo_distance: {
-                      location: {
-                          lat:  lat,
-                          lon: lon
-                      },
-                      order:         :asc,
-                      unit:          :km,
-                      distance_type: :sloppy_arc
-                  }
-              }
-          ]
+            }
+          }
+        },
+        sort: [
+          {
+            _geo_distance: {
+              location: {
+                lat:  lat,
+                lon: lon
+              },
+              order:         :asc,
+              unit:          :km,
+              distance_type: :sloppy_arc
+            }
+          }
+        ]
       }
     end
 
     def create(location:, vacant:)
       connection.create(index: settings.index_name, type: settings.index_type, body: {
-          location: location,
-          vacant: vacant,
+        location: location,
+        vacant: vacant,
       })['_id']
     end
     def count
