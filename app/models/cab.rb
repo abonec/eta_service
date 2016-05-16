@@ -19,7 +19,9 @@ module App
         query: {
           bool: {
             must: {
-              match_all: {}
+              term: {
+                vacant: true
+              }
             }, 
             filter: {
               geo_distance: {
